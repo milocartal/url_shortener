@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
 import useSWR from "swr"
+
 
 const inter = Inter({ subsets: ['latin'] })
 //{ data: user } = useSWR(‘/api/user’, { refreshInterval: 2000 })
@@ -28,11 +28,12 @@ export default function Home() {
 
   return (
     <div>
-      <h1>URL Shortener</h1>
+      <h1>URL Shortener 2000</h1>
       <form onSubmit={handleSubmit}>
-        <input type="text" value={url} onChange={handleUrlChange} />
+        <input type="text" value={url} onChange={handleUrlChange} placeholder="Your URL"/>
         <button type="submit">Shorten</button>
       </form>
+
       {shortUrl && (
         <div>
           <p>Short URL:</p>
