@@ -5,7 +5,7 @@ export default function App({ Component, pageProps }) {
   return(
     <>
       <Head>
-        <title>URL Shortener 2000 | By Milo</title>
+        <title>Loki's Url Shortener</title>
       </Head>
       
     <Component {...pageProps} />

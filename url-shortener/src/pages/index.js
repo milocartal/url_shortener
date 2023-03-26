@@ -23,23 +23,25 @@ export default function Home() {
 
     const response = await axios.post('/api/shorten', { url });
     setShortUrl(response.data.shortUrl);
-    console.log('caca ',response.data.shortUrl)
+    console.log('caca ', response.data.shortUrl)
   };
 
   return (
     <div>
-      <h1>URL Shortener 2000</h1>
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={url} onChange={handleUrlChange} placeholder="Your URL"/>
+      <h1>Loki's Url Shortener</h1>
+      <div id="content">
+      <form onSubmit={handleSubmit} id="kristen-project">
+        <input type="text" value={url} onChange={handleUrlChange} placeholder="Your URL" />
         <button type="submit">Shorten</button>
       </form>
 
       {shortUrl && (
-        <div>
-          <p>Short URL:</p>
+        <div id='short'>
+          <p>Short Url:</p>
           <a target="_blank" href={shortUrl}>{shortUrl}</a>
         </div>
       )}
+      </div>
     </div>
   );
 }
