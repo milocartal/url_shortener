@@ -1,18 +1,9 @@
-import { HydrateClient } from "~/trpc/server";
+import { api, HydrateClient } from "~/trpc/server";
 import { CreateShortUrl } from "~/app/_components/create";
 import { ShortUrlList } from "~/app/_components/list";
-import { redisClient } from "~/server/db";
-import { formatShortUrl } from "~/lib/utils";
 
 export default async function Home() {
-  const keys = await redisClient.keys("*");
-  const urls = await Promise.all(
-    keys.map(async (key) => {
-      const originalUrl = await redisClient.get(key);
-      const shortUrl = formatShortUrl(key);
-      return { shortUrl, originalUrl };
-    }),
-  );
+  const urls = await api.url.list();
 
   return (
     <HydrateClient>
