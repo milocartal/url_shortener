@@ -38,11 +38,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Maskly - Raccourcisseur d'URL",
     description: "Un service de raccourcissement d'URL simple et efficace.",
-    url: "https://maskly.app",
+    url: new URL(env.NEXT_PUBLIC_URL ?? "http://localhost:3000"),
     siteName: "Maskly",
     images: [
       {
-        url: "/og-image.png",
+        url: "/icon1.png",
         width: 1200,
         height: 630,
         alt: "Maskly - Raccourcisseur d'URL",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Maskly - Raccourcisseur d'URL",
     description: "Un service de raccourcissement d'URL simple et efficace.",
-    images: ["/og-image.png"],
+    images: ["/icon1.png"],
     creator: "@maskly_app",
   },
 };
@@ -78,10 +78,6 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${geist.variable}`}>
       <head>
-        <meta
-          name="description"
-          content="Un service de raccourcissement d'URL simple et efficace."
-        />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon.png" />
         <link rel="icon" type="image/png" sizes="96x96" href="/icon1.png" />
         <link

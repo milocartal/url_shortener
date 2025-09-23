@@ -108,6 +108,8 @@ export const CreateShortUrl: React.FC = () => {
               <FormControl>
                 <Input
                   placeholder="https://www.example.com/articles/2024/06/10/how-to-use-url-shortener"
+                  type="url"
+                  required
                   {...field}
                 />
               </FormControl>
