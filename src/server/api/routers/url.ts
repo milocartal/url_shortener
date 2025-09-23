@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import shortid from "shortid";
 import { z } from "zod";
+import type { StoredUrl, UrlData } from "~/lib/models/Url";
 import { extractKeyFromShortUrl, formatShortUrl } from "~/lib/utils";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
@@ -26,16 +27,25 @@ export const urlRouter = createTRPCRouter({
     const keys = await redisClient.keys("*");
     const urls = await Promise.all(
       keys.map(async (key) => {
-        const originalUrl = await redisClient.get(key);
+        const originalUrlData = await redisClient.get(key);
+        const urlData = originalUrlData
+          ? (JSON.parse(originalUrlData) as UrlData)
+          : null;
         const shortUrl = formatShortUrl(key);
-        return { shortUrl, originalUrl };
+        return { shortUrl, urlData };
       }),
     );
-    return urls;
+    return urls as StoredUrl[];
   }),
 
   shorten: publicProcedure
-    .input(z.object({ url: z.string().url() }))
+    .input(
+      z.object({
+        url: z.string().url(),
+        expTime: z.number().optional(),
+        isTemp: z.boolean(),
+      }),
+    )
     .mutation(async ({ input }) => {
       let id = shortid.generate();
       while (await redisClient.get(`${id}`)) {
@@ -44,18 +54,40 @@ export const urlRouter = createTRPCRouter({
 
       const shortUrl = formatShortUrl(id);
 
-      await redisClient
-        .set(id, input.url)
-        .then(() => {
-          console.log(`URL shortened: ${input.url} -> ${shortUrl}`);
-        })
-        .catch((error) => {
-          console.error("Error setting value in Redis", error);
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Failed to shorten URL",
+      const body = {
+        url: input.url,
+        createdAt: new Date(),
+        expTime: input.expTime,
+        isTemp: input.isTemp,
+      };
+
+      if (input.isTemp && input.expTime) {
+        await redisClient
+          .set(id, JSON.stringify(body), { EX: input.expTime })
+          .then(() => {
+            console.log(`URL shortened: ${input.url} -> ${shortUrl}`);
+          })
+          .catch((error) => {
+            console.error("Error setting value in Redis", error);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to shorten URL",
+            });
           });
-        });
+      } else {
+        await redisClient
+          .set(id, JSON.stringify(body))
+          .then(() => {
+            console.log(`URL shortened: ${input.url} -> ${shortUrl}`);
+          })
+          .catch((error) => {
+            console.error("Error setting value in Redis", error);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to shorten URL",
+            });
+          });
+      }
 
       return { shortUrl };
     }),
